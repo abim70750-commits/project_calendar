@@ -95,5 +95,10 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
-          name: Build ${{ github.run_number }}
+          name: Project Calendar - Build ${{ github.run_number }}
+          body: |
+            Build otomatis dari commit terbaru.
+
+            Commit: ${{ github.event.head_commit.message }}
+          generate_release_notes: true
           files: build/app/outputs/flutter-apk/*.apk
