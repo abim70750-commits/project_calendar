@@ -4,7 +4,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../data/project_repository.dart';
 import '../models/app_settings.dart';
-import '../models/project.dart';
+import '../models/project.dart' hide Priority;
 import '../utils/date_utils.dart';
 import '../utils/motivation_quotes.dart';
 
