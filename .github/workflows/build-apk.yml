@@ -41,6 +41,7 @@ jobs:
         run: |
           flutter create --platforms=android --org com.projectcalendar --project-name project_calendar .
           rm -rf test android/app/src/main/kotlin/com/projectcalendar/project_calendar
+          rm -f android/build.gradle.kts android/settings.gradle.kts android/app/build.gradle.kts
 
       - run: flutter pub get
 
