@@ -2,15 +2,15 @@ import 'subtask.dart';
 import 'tag.dart';
 
 /// Sorted by importance; [weight] is what sorting uses.
+/// Display names live in l10n_extensions.dart so they can be translated.
 enum Priority {
-  high('Tinggi', 3),
-  medium('Sedang', 2),
-  low('Rendah', 1),
-  none('Tanpa prioritas', 0);
+  high(3),
+  medium(2),
+  low(1),
+  none(0);
 
-  const Priority(this.label, this.weight);
+  const Priority(this.weight);
 
-  final String label;
   final int weight;
 
   static Priority parse(Object? raw) => Priority.values
@@ -21,8 +21,6 @@ enum Priority {
 const List<int> kDefaultReminders = [1, 0];
 
 const int kMaxReminders = 3;
-
-String reminderLabel(int days) => days == 0 ? 'Hari-H' : 'H-$days';
 
 /// A missing value (old rows / old backups) means "defaults"; an empty string
 /// means the user deliberately removed every reminder.

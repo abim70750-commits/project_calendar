@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/project.dart';
 import '../models/tag.dart';
 import '../providers/project_provider.dart';
+import '../utils/l10n_extensions.dart';
 import 'priority_badge.dart';
 import 'tag_chip.dart';
 
@@ -31,12 +33,13 @@ class ProjectFilterChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         _row([
           for (final s in StatusFilter.values)
             ChoiceChip(
-              label: Text(s.label),
+              label: Text(s.label(l10n)),
               selected: filter.status == s,
               onSelected: (_) => onChanged(filter.copyWith(status: s)),
             ),
@@ -45,7 +48,7 @@ class ProjectFilterChips extends StatelessWidget {
           for (final p in Priority.values)
             FilterChip(
               avatar: Icon(Icons.flag, size: 16, color: priorityColor(p)),
-              label: Text(p == Priority.none ? 'Tanpa' : p.label),
+              label: Text(p == Priority.none ? l10n.filterPriorityNoneShort : p.label(l10n)),
               selected: filter.priority == p,
               onSelected: (on) => onChanged(on
                   ? filter.copyWith(priority: p)

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart' hide TextDirection;
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/project.dart';
 import '../models/tag.dart';
 import '../providers/project_provider.dart';
 import '../utils/date_utils.dart';
+import '../utils/l10n_extensions.dart';
 
 class StatsScreen extends StatelessWidget {
   const StatsScreen({super.key});
@@ -30,6 +32,7 @@ class StatsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // Statistics cover archived projects too: archiving is housekeeping, not deletion.
     final all = context.watch<ProjectProvider>().all;
     final now = DateTime.now();
@@ -60,7 +63,8 @@ class StatsScreen extends StatelessWidget {
     final doneSeries =
         days.map((d) => countOn(d, (p) => p.isCompleted ? p.completedAt : null)).toList();
     final activitySeries = days.map((d) => countOn(d, (p) => p.updatedAt)).toList();
-    final labels = days.map((d) => DateFormat('E', 'id_ID').format(d)).toList();
+    final localeName = Localizations.localeOf(context).toString();
+    final labels = days.map((d) => DateFormat.E(localeName).format(d)).toList();
 
     final tagCounts = <String, int>{};
     final tagById = <String, Tag>{};
@@ -107,9 +111,9 @@ class StatsScreen extends StatelessWidget {
         );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Statistik')),
+      appBar: AppBar(title: Text(l10n.statsTitle)),
       body: total == 0
-          ? const Center(child: Text('Belum ada data untuk dihitung.'))
+          ? Center(child: Text(l10n.statsEmpty))
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
@@ -117,15 +121,19 @@ class StatsScreen extends StatelessWidget {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    tile('Total project', '$total'),
-                    tile('Tingkat selesai', '${(rate * 100).round()}%'),
-                    tile('Durasi rencana rata-rata', '${avgPlanned.toStringAsFixed(1)} hari'),
-                    tile('Durasi aktual rata-rata',
-                        avgActual == null ? '-' : '${avgActual.toStringAsFixed(1)} hari'),
+                    tile(l10n.statsTotal, '$total'),
+                    tile(l10n.statsCompletionRate, '${(rate * 100).round()}%'),
+                    tile(l10n.statsAvgPlanned,
+                        l10n.statsDaysValue(avgPlanned.toStringAsFixed(1))),
+                    tile(
+                        l10n.statsAvgActual,
+                        avgActual == null
+                            ? '-'
+                            : l10n.statsDaysValue(avgActual.toStringAsFixed(1))),
                   ],
                 ),
                 const SizedBox(height: 24),
-                Text('Status project', style: theme.textTheme.titleMedium),
+                Text(l10n.statsStatusTitle, style: theme.textTheme.titleMedium),
                 const SizedBox(height: 8),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(6),
@@ -154,14 +162,14 @@ class StatsScreen extends StatelessWidget {
                         children: [
                           Container(width: 10, height: 10, color: _bucketColor(e.key)),
                           const SizedBox(width: 4),
-                          Text('${e.key.label}: ${e.value}',
+                          Text('${e.key.label(l10n)}: ${e.value}',
                               style: const TextStyle(fontSize: 11)),
                         ],
                       ),
                   ],
                 ),
                 const SizedBox(height: 24),
-                Text('7 hari terakhir', style: theme.textTheme.titleMedium),
+                Text(l10n.statsLast7Days, style: theme.textTheme.titleMedium),
                 const SizedBox(height: 8),
                 SizedBox(
                   height: 180,
@@ -184,18 +192,18 @@ class StatsScreen extends StatelessWidget {
                   children: [
                     Container(width: 10, height: 10, color: _doneColor),
                     const SizedBox(width: 4),
-                    const Text('Selesai', style: TextStyle(fontSize: 11)),
+                    Text(l10n.statsLegendCompleted, style: const TextStyle(fontSize: 11)),
                     const SizedBox(width: 16),
                     Container(width: 10, height: 10, color: _activityColor),
                     const SizedBox(width: 4),
-                    const Text('Diperbarui', style: TextStyle(fontSize: 11)),
+                    Text(l10n.statsLegendUpdated, style: const TextStyle(fontSize: 11)),
                   ],
                 ),
                 const SizedBox(height: 24),
-                Text('Top 5 tag', style: theme.textTheme.titleMedium),
+                Text(l10n.statsTopTags, style: theme.textTheme.titleMedium),
                 const SizedBox(height: 8),
                 if (top5.isEmpty)
-                  const Text('Belum ada tag yang dipakai.')
+                  Text(l10n.statsNoTags)
                 else
                   for (final e in top5)
                     Padding(

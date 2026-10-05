@@ -3,12 +3,15 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/project.dart';
+import '../utils/l10n_extensions.dart';
 
 /// Builds an RFC 5545 calendar with one all-day VEVENT per project.
 class IcsExporter {
   static String build(
     List<Project> projects, {
+    required AppLocalizations l10n,
     int alarmHour = 6,
     int alarmMinute = 0,
     DateTime? now,
@@ -27,16 +30,19 @@ class IcsExporter {
       // DTEND of an all-day event is exclusive, so the deadline day needs +1.
       final endExclusive =
           DateTime(p.deadline.year, p.deadline.month, p.deadline.day + 1);
+      final status = p.isCompleted
+          ? l10n.statusCompleted
+          : (p.isOverdue ? l10n.statusOverdue : l10n.icsStatusInProgress);
       final desc = StringBuffer()
-        ..write('Progres: ${p.progress}%')
-        ..write('\nPrioritas: ${p.priority.label}')
-        ..write('\nStatus: ${p.isCompleted ? 'Selesai' : (p.isOverdue ? 'Overdue' : 'Berjalan')}');
+        ..write(l10n.icsProgress(p.progress))
+        ..write('\n${l10n.icsPriority(p.priority.label(l10n))}')
+        ..write('\n${l10n.icsStatus(status)}');
       if (p.tags.isNotEmpty) {
-        desc.write('\nTag: ${p.tags.map((t) => t.name).join(', ')}');
+        desc.write('\n${l10n.icsTags(p.tags.map((t) => t.name).join(', '))}');
       }
       if (p.subtasks.isNotEmpty) {
         final done = p.subtasks.where((s) => s.isDone).length;
-        desc.write('\nSub-tugas: $done/${p.subtasks.length}');
+        desc.write('\n${l10n.icsSubtasks(done, p.subtasks.length)}');
       }
       if (p.notes.trim().isNotEmpty) desc.write('\n\n${p.notes.trim()}');
 
@@ -65,7 +71,7 @@ class IcsExporter {
           lines
             ..add('BEGIN:VALARM')
             ..add('ACTION:DISPLAY')
-            ..add('DESCRIPTION:${_escape('${reminderLabel(days)}: ${p.name}')}')
+            ..add('DESCRIPTION:${_escape('${reminderLabel(l10n, days)}: ${p.name}')}')
             ..add('TRIGGER;RELATED=END:-PT${minutes}M')
             ..add('END:VALARM');
         }
@@ -79,7 +85,8 @@ class IcsExporter {
 
   /// Writes to public Downloads; falls back to app storage because scoped
   /// storage on Android 11+ often rejects direct writes there.
-  static Future<File> saveToDownloads(String content, {DateTime? now}) async {
+  static Future<File> saveToDownloads(String content,
+      {required String noLocationMessage, DateTime? now}) async {
     final n = now ?? DateTime.now();
     final name = 'project_calendar_${_date(n)}.ics';
     final candidates = <File>[File('/storage/emulated/0/Download/$name')];
@@ -99,7 +106,7 @@ class IcsExporter {
         lastError = e;
       }
     }
-    throw lastError ?? 'Tidak ada lokasi penyimpanan yang bisa ditulis';
+    throw lastError ?? FileSystemException(noLocationMessage);
   }
 
   static String _two(int v) => v.toString().padLeft(2, '0');

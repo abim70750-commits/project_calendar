@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/project.dart';
 import '../utils/color_logic.dart';
 
@@ -20,7 +21,7 @@ class StatusBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
-        labelOf(status),
+        labelOf(AppLocalizations.of(context)!, status),
         style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold),
       ),
     );

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/project.dart';
+import '../utils/l10n_extensions.dart';
 
 Color priorityColor(Priority p) {
   switch (p) {
@@ -37,7 +39,7 @@ class PriorityBadge extends StatelessWidget {
         children: [
           Icon(Icons.flag, size: 12, color: color),
           const SizedBox(width: 3),
-          Text(priority.label,
+          Text(priority.label(AppLocalizations.of(context)!),
               style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),
         ],
       ),

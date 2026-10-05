@@ -37,7 +37,7 @@ class TagProvider extends ChangeNotifier {
       _usage = await _repo.usageCounts();
       loadError = null;
     } catch (e) {
-      loadError = 'Gagal memuat tag: $e';
+      loadError = e.toString();
     }
     notifyListeners();
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/tag.dart';
 import '../providers/project_provider.dart';
 import '../providers/tag_provider.dart';
@@ -31,19 +32,24 @@ class _TagsScreenState extends State<TagsScreen> {
   }
 
   Future<void> _delete(Tag tag) async {
+    final l10n = AppLocalizations.of(context)!;
     final tags = context.read<TagProvider>();
     final projects = context.read<ProjectProvider>();
     final used = tags.usageOf(tag.id);
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Hapus tag?'),
+        title: Text(l10n.tagsDeleteTitle),
         content: Text(used == 0
-            ? 'Tag "${tag.name}" akan dihapus.'
-            : 'Tag "${tag.name}" akan dilepas dari $used project. Project-nya tetap ada.'),
+            ? l10n.tagsDeleteUnused(tag.name)
+            : l10n.tagsDeleteUsed(tag.name, used)),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Batal')),
-          FilledButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Hapus')),
+          TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(l10n.commonCancel)),
+          FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text(l10n.commonDelete)),
         ],
       ),
     );
@@ -56,12 +62,13 @@ class _TagsScreenState extends State<TagsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final provider = context.watch<TagProvider>();
     final tags = provider.tags;
     return Scaffold(
-      appBar: AppBar(title: const Text('Kelola Tag')),
+      appBar: AppBar(title: Text(l10n.tagsTitle)),
       floatingActionButton: FloatingActionButton(
-        tooltip: 'Tag baru',
+        tooltip: l10n.tagsNewTooltip,
         onPressed: () => _edit(),
         child: const Icon(Icons.add),
       ),
@@ -70,7 +77,9 @@ class _TagsScreenState extends State<TagsScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Text(
-                  provider.loadError ?? 'Belum ada tag. Tekan + untuk membuat.',
+                  provider.loadError == null
+                      ? l10n.tagsEmpty
+                      : l10n.errorLoadTags(provider.loadError!),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -85,17 +94,17 @@ class _TagsScreenState extends State<TagsScreen> {
                 return ListTile(
                   leading: CircleAvatar(backgroundColor: t.color, radius: 12),
                   title: Text(t.name),
-                  subtitle: Text('$used project'),
+                  subtitle: Text(l10n.tagsUsage(used)),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        tooltip: 'Ubah',
+                        tooltip: l10n.commonEdit,
                         icon: const Icon(Icons.edit),
                         onPressed: () => _edit(existing: t),
                       ),
                       IconButton(
-                        tooltip: 'Hapus',
+                        tooltip: l10n.commonDelete,
                         icon: const Icon(Icons.delete_outline),
                         onPressed: () => _delete(t),
                       ),

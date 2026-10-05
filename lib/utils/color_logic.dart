@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/project.dart';
 import 'date_utils.dart';
 
@@ -29,27 +30,27 @@ Color colorOf(ProjectStatus s) {
   }
 }
 
-String labelOf(ProjectStatus s) {
+String labelOf(AppLocalizations l10n, ProjectStatus s) {
   switch (s) {
     case ProjectStatus.completed:
-      return 'Selesai';
+      return l10n.statusCompleted;
     case ProjectStatus.overdue:
-      return 'Terlambat';
+      return l10n.statusOverdue;
     case ProjectStatus.urgent:
-      return 'Mendesak';
+      return l10n.statusUrgent;
     case ProjectStatus.warning:
-      return 'Waspada';
+      return l10n.statusWarning;
     case ProjectStatus.safe:
-      return 'Aman';
+      return l10n.statusSafe;
   }
 }
 
 /// Short human text for the remaining time.
-String remainingText(Project p) {
-  if (p.isCompleted) return 'Selesai';
+String remainingText(AppLocalizations l10n, Project p) {
+  if (p.isCompleted) return l10n.statusCompleted;
   final left = daysLeftFor(p.deadline);
-  if (p.isOverdue) return 'Lewat deadline';
-  if (left < 0) return 'Lewat ${-left} hari';
-  if (left == 0) return 'Hari ini';
-  return 'Sisa $left hari';
+  if (p.isOverdue) return l10n.remainingPastDeadline;
+  if (left < 0) return l10n.remainingDaysLate(-left);
+  if (left == 0) return l10n.remainingToday;
+  return l10n.remainingDaysLeft(left);
 }

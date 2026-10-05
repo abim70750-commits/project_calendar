@@ -1,0 +1,481 @@
+{
+  "@@locale": "en",
+  "appTitle": "Project Calendar",
+  "commonCancel": "Cancel",
+  "commonSave": "Save",
+  "commonDelete": "Delete",
+  "commonEdit": "Edit",
+  "commonSelect": "Select",
+  "commonRetry": "Try again",
+  "commonReset": "Reset",
+  "commonRestore": "Restore",
+  "commonMerge": "Merge",
+  "commonReplaceAll": "Replace all",
+  "commonClose": "Close",
+  "errorGeneric": "Something went wrong: {details}",
+  "@errorGeneric": {
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
+  "errorLoadData": "Failed to load data: {details}",
+  "@errorLoadData": {
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
+  "errorLoadTags": "Failed to load tags: {details}",
+  "@errorLoadTags": {
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
+  "errorNoWritableLocation": "No writable storage location available",
+  "homeStatsTooltip": "Statistics",
+  "homeArchiveTooltip": "Archive",
+  "homeSettingsTooltip": "Settings",
+  "homeAddProjectTooltip": "Add project",
+  "homeCalendarMonth": "Month",
+  "homeLegendWarning": "≤ 3 days",
+  "homeLegendUrgent": "≤ 1 day / late",
+  "homeProjectListTitle": "Projects ({count})",
+  "@homeProjectListTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeEmptyNoProjects": "No projects yet. Tap + to start.",
+  "homeEmptyNoMatch": "No projects match.",
+  "homeResetFilters": "Reset filters",
+  "homeDayNoProjects": "No projects on this date.",
+  "homeDayNoMatch": "No projects on this date match the current filters.",
+  "searchHint": "Search project name or tag",
+  "searchClearTooltip": "Clear search",
+  "sortTooltip": "Sort",
+  "sortDeadlineAsc": "Nearest deadline",
+  "sortDeadlineDesc": "Farthest deadline",
+  "sortStartAsc": "Start date",
+  "sortProgressDesc": "Highest progress",
+  "sortPriorityDesc": "Highest priority",
+  "sortCreatedDesc": "Recently created",
+  "filterStatusAll": "All",
+  "filterStatusNotStarted": "Not started",
+  "filterStatusOngoing": "In progress",
+  "filterStatusCompleted": "Completed",
+  "filterStatusOverdue": "Overdue",
+  "filterPriorityNoneShort": "None",
+  "statusCompleted": "Completed",
+  "statusOverdue": "Overdue",
+  "statusUrgent": "Urgent",
+  "statusWarning": "Warning",
+  "statusSafe": "On track",
+  "remainingPastDeadline": "Past deadline",
+  "remainingToday": "Due today",
+  "remainingDaysLeft": "{count, plural, =1{1 day left} other{{count} days left}}",
+  "@remainingDaysLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "remainingDaysLate": "{count, plural, =1{1 day late} other{{count} days late}}",
+  "@remainingDaysLate": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cardDeadlineLine": "Deadline {date} • {remaining}",
+  "@cardDeadlineLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "priorityHigh": "High",
+  "priorityMedium": "Medium",
+  "priorityLow": "Low",
+  "priorityNone": "No priority",
+  "reminderOnDeadlineDay": "On deadline day",
+  "reminderDaysBefore": "{days, plural, =1{1 day before} other{{days} days before}}",
+  "@reminderDaysBefore": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "formTitleCreate": "New Project",
+  "formTitleEdit": "Edit Project",
+  "formNameLabel": "Project name",
+  "formNameRequired": "Project name is required",
+  "formStartDateLabel": "Start date",
+  "formDeadlineLabel": "Deadline",
+  "formPickDate": "Pick a date",
+  "formPickStartHelp": "Select start date",
+  "formPickDeadlineHelp": "Select deadline",
+  "formStartRequired": "Start date is required",
+  "formDeadlineRequired": "Deadline is required",
+  "formDeadlineBeforeStart": "Deadline cannot be before the start date",
+  "formPriorityTitle": "Priority",
+  "formTagsTitle": "Tags",
+  "formNewTag": "New tag",
+  "formRemindersTitle": "Deadline reminders",
+  "formAddReminder": "Add",
+  "formReminderDialogTitle": "Remind before deadline",
+  "formReminderHintMax": "Up to {max} reminders, sent at the daily notification time.",
+  "@formReminderHintMax": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "formReminderNone": "No custom reminders for this project.",
+  "formNotesTitle": "Initial notes (markdown)",
+  "formNotesHint": "Write notes using markdown...",
+  "formSave": "Save",
+  "formSaving": "Saving...",
+  "detailTitle": "Project Details",
+  "detailNotFound": "Project not found.",
+  "detailArchivedBanner": "This project is archived.",
+  "detailStartLine": "Start: {date}",
+  "@detailStartLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "detailDeadlineLine": "Deadline: {date}",
+  "@detailDeadlineLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "detailRemindersNone": "Reminders: none",
+  "detailRemindersLine": "Reminders: {list}",
+  "@detailRemindersLine": {
+    "placeholders": {
+      "list": {
+        "type": "String"
+      }
+    }
+  },
+  "progressLabel": "Progress: {percent}%",
+  "@progressLabel": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "detailNotesTitle": "Notes",
+  "detailNotesEdit": "Edit",
+  "detailNotesView": "View",
+  "detailNotesHint": "Write notes using markdown...",
+  "detailNotesSave": "Save notes",
+  "detailNotesSaved": "Notes saved",
+  "detailNotesEmpty": "No notes yet.",
+  "detailSubtasksTitle": "Subtasks ({done}/{total})",
+  "@detailSubtasksTitle": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "detailAddSubtask": "Add subtask",
+  "detailSubtasksEmpty": "No subtasks yet.",
+  "detailSubtasksReorderHint": "Long-press and drag to reorder.",
+  "detailSubtaskNewTitle": "New subtask",
+  "detailSubtaskEditTitle": "Edit subtask",
+  "detailSubtaskHint": "Subtask title",
+  "detailMarkComplete": "Mark as completed",
+  "detailUndoComplete": "Undo completion",
+  "detailDuplicateButton": "Duplicate",
+  "detailArchiveButton": "Archive",
+  "detailRestoreButton": "Restore from archive",
+  "detailDeleteButton": "Delete",
+  "detailDeleteTitle": "Delete project?",
+  "detailDeleteMessage": "\"{name}\" and its notes, subtasks, and tag links will be permanently deleted.",
+  "@detailDeleteMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "detailDuplicated": "Project duplicated",
+  "detailArchived": "Project archived",
+  "detailRestored": "Project restored",
+  "detailDuplicateSuffix": "copy",
+  "archiveTitle": "Archive ({count})",
+  "@archiveTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "archiveEmpty": "The archive is empty. Projects completed more than 7 days ago are archived automatically.",
+  "archiveAutoNote": "Projects completed more than 7 days ago are archived automatically.",
+  "archiveDeleteTitle": "Delete permanently?",
+  "archiveDeleteMessage": "\"{name}\" will be deleted from the archive and cannot be recovered.",
+  "@archiveDeleteMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "statsTitle": "Statistics",
+  "statsEmpty": "No data to calculate yet.",
+  "statsTotal": "Total projects",
+  "statsCompletionRate": "Completion rate",
+  "statsAvgPlanned": "Avg. planned duration",
+  "statsAvgActual": "Avg. actual duration",
+  "statsDaysValue": "{value} days",
+  "@statsDaysValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "statsStatusTitle": "Project status",
+  "statsLast7Days": "Last 7 days",
+  "statsLegendCompleted": "Completed",
+  "statsLegendUpdated": "Updated",
+  "statsTopTags": "Top 5 tags",
+  "statsNoTags": "No tags in use yet.",
+  "tagsTitle": "Manage Tags",
+  "tagsNewTooltip": "New tag",
+  "tagsEmpty": "No tags yet. Tap + to create one.",
+  "tagsUsage": "{count, plural, =1{1 project} other{{count} projects}}",
+  "@tagsUsage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tagsDeleteTitle": "Delete tag?",
+  "tagsDeleteUnused": "Tag \"{name}\" will be deleted.",
+  "@tagsDeleteUnused": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "tagsDeleteUsed": "Tag \"{name}\" will be removed from {count, plural, =1{1 project} other{{count} projects}}. The projects themselves stay.",
+  "@tagsDeleteUsed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tagEditorCreateTitle": "New tag",
+  "tagEditorEditTitle": "Edit tag",
+  "tagEditorNameLabel": "Tag name",
+  "tagEditorColorLabel": "Color",
+  "tagEditorNameRequired": "Tag name is required",
+  "tagEditorNameTooLong": "Maximum 24 characters",
+  "tagEditorNameTaken": "Tag name is already in use",
+  "settingsTitle": "Settings",
+  "settingsAppearance": "Appearance",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeSystem": "System",
+  "settingsFontLabel": "Font",
+  "settingsFontMissing": "Custom font file not found, using a fallback",
+  "fontSystemDefault": "System default",
+  "settingsLanguageLabel": "Language",
+  "settingsLanguageHint": "Only English is available for now. Other languages fall back to English.",
+  "settingsDailyNotifications": "Daily notifications",
+  "settingsNotificationTime": "Notification time",
+  "settingsPickTimeHelp": "Select notification time",
+  "settingsMotivation": "Motivational quotes",
+  "settingsManageTags": "Manage tags",
+  "settingsExportIcs": "Export to calendar (.ics)",
+  "settingsExportIcsSubtitle": "All projects, including archived",
+  "settingsExportIcsEmpty": "No projects to export yet",
+  "settingsExportIcsDone": "Calendar exported to {path}",
+  "@settingsExportIcsDone": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsExportJson": "Export data (JSON)",
+  "settingsExportJsonDone": "Data exported to {path}",
+  "@settingsExportJsonDone": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsImportJson": "Import data (JSON)",
+  "settingsImportTitle": "Import data",
+  "settingsImportNotFound": "No backup file found. Paste the JSON content below.",
+  "settingsImportFound": "Backup file found. Choose how to import:",
+  "settingsImportInvalid": "Unrecognized backup format",
+  "settingsImportDone": "{count, plural, =1{1 project imported} other{{count} projects imported}}",
+  "@settingsImportDone": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsResetData": "Reset all data",
+  "settingsResetTitle": "Reset all data?",
+  "settingsResetMessage": "All projects, notes, subtasks, and tags will be permanently deleted.",
+  "settingsResetDone": "All data deleted",
+  "aboutSectionTitle": "About",
+  "aboutAppName": "App name",
+  "aboutVersion": "Version",
+  "aboutCopyright": "Copyright",
+  "aboutCopyrightValue": "© {year} {holder}",
+  "@aboutCopyrightValue": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      },
+      "holder": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutLicense": "License",
+  "aboutLicenseName": "MIT License",
+  "aboutLicenseUrlLabel": "Full text: {url}",
+  "@aboutLicenseUrlLabel": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationChannelName": "Project reminders",
+  "notificationChannelDescription": "Daily summary and deadline reminders",
+  "notificationSummaryTitle": "{count, plural, =1{Heads up: 1 project is active} other{Heads up: {count} projects are active}}",
+  "@notificationSummaryTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationSummaryLine": "{name} — {days, plural, =0{due today} =1{1 day left} other{{days} days left}}",
+  "@notificationSummaryLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationTomorrowTitle": "Due tomorrow: {name}",
+  "@notificationTomorrowTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationTomorrowBody": "Only 1 day left. Let’s finish it!",
+  "notificationTodayTitle": "Due today: {name}",
+  "@notificationTodayTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationTodayBody": "24-hour countdown. Miss it and the project turns red for good.",
+  "notificationSoonTitle": "Due in {days} days: {name}",
+  "@notificationSoonTitle": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationSoonBody": "Start preparing now, don’t leave it to the last minute.",
+  "icsProgress": "Progress: {percent}%",
+  "@icsProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "icsPriority": "Priority: {priority}",
+  "@icsPriority": {
+    "placeholders": {
+      "priority": {
+        "type": "String"
+      }
+    }
+  },
+  "icsStatus": "Status: {status}",
+  "@icsStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "icsStatusInProgress": "In progress",
+  "icsTags": "Tags: {tags}",
+  "@icsTags": {
+    "placeholders": {
+      "tags": {
+        "type": "String"
+      }
+    }
+  },
+  "icsSubtasks": "Subtasks: {done}/{total}",
+  "@icsSubtasks": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
+}

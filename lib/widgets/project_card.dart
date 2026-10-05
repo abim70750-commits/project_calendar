@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/project.dart';
 import '../utils/color_logic.dart';
 import '../utils/date_utils.dart';
@@ -15,6 +16,7 @@ class ProjectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final color = colorOf(statusOf(project));
     final shownTags = project.tags.take(3).toList();
     final extraTags = project.tags.length - shownTags.length;
@@ -59,7 +61,9 @@ class ProjectCard extends StatelessWidget {
                 ),
               ],
               const SizedBox(height: 8),
-              Text('Deadline ${formatDate(project.deadline)} • ${remainingText(project)}',
+              Text(
+                  l10n.cardDeadlineLine(
+                      formatDate(context, project.deadline), remainingText(l10n, project)),
                   style: Theme.of(context).textTheme.bodySmall),
               const SizedBox(height: 8),
               LinearProgressIndicator(value: project.progress / 100, color: color),

@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 /// Strips the time part so comparisons are day-based.
@@ -12,4 +13,6 @@ int daysLeftFor(DateTime deadline, [DateTime? now]) {
   return a.difference(b).inDays;
 }
 
-String formatDate(DateTime d) => DateFormat('d MMM yyyy', 'id_ID').format(d);
+/// Formats with the active app locale, so dates follow the language setting.
+String formatDate(BuildContext context, DateTime d) =>
+    DateFormat.yMMMd(Localizations.localeOf(context).toString()).format(d);

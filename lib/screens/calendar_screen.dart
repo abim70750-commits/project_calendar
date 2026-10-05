@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/project.dart';
 import '../providers/project_provider.dart';
 import '../providers/tag_provider.dart';
@@ -37,6 +38,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   void _showDay(DateTime day) {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -52,15 +54,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
               shrinkWrap: true,
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
               children: [
-                Text(formatDate(day), style: Theme.of(context).textTheme.titleMedium),
+                Text(formatDate(context, day),
+                    style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 12),
                 if (list.isEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 24),
                     child: Center(
                       child: Text(prov.filter.isDefault && prov.query.isEmpty
-                          ? 'Tidak ada project di tanggal ini.'
-                          : 'Tidak ada project yang cocok dengan filter di tanggal ini.'),
+                          ? l10n.homeDayNoProjects
+                          : l10n.homeDayNoMatch),
                     ),
                   ),
                 for (final Project p in list)
@@ -91,20 +94,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
         ],
       );
 
-  Widget _emptyState(ProjectProvider prov) {
+  Widget _emptyState(AppLocalizations l10n, ProjectProvider prov) {
     final filtering = !prov.filter.isDefault || prov.query.isNotEmpty;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
       child: Column(
         children: [
           Text(
-            filtering
-                ? 'Tidak ada project yang cocok.'
-                : 'Belum ada project. Tekan + untuk mulai.',
+            filtering ? l10n.homeEmptyNoMatch : l10n.homeEmptyNoProjects,
             textAlign: TextAlign.center,
           ),
           if (filtering)
-            TextButton(onPressed: prov.resetFilters, child: const Text('Reset filter')),
+            TextButton(onPressed: prov.resetFilters, child: Text(l10n.homeResetFilters)),
         ],
       ),
     );
@@ -112,33 +113,34 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final prov = context.watch<ProjectProvider>();
     final tags = context.watch<TagProvider>().tags;
     final visible = prov.visible;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Project Calendar'),
+        title: Text(l10n.appTitle),
         actions: [
           IconButton(
-            tooltip: 'Statistik',
+            tooltip: l10n.homeStatsTooltip,
             icon: const Icon(Icons.bar_chart),
             onPressed: () => _push(const StatsScreen()),
           ),
           IconButton(
-            tooltip: 'Arsip',
+            tooltip: l10n.homeArchiveTooltip,
             icon: const Icon(Icons.archive_outlined),
             onPressed: () => _push(const ArchiveScreen()),
           ),
           IconButton(
-            tooltip: 'Pengaturan',
+            tooltip: l10n.homeSettingsTooltip,
             icon: const Icon(Icons.settings),
             onPressed: () => _push(const SettingsScreen()),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        tooltip: 'Tambah project',
+        tooltip: l10n.homeAddProjectTooltip,
         onPressed: () => _push(const ProjectFormScreen()),
         child: const Icon(Icons.add),
       ),
@@ -150,9 +152,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
               children: [
                 if (prov.loadError != null)
                   MaterialBanner(
-                    content: Text(prov.loadError!),
+                    content: Text(l10n.errorLoadData(prov.loadError!)),
                     actions: [
-                      TextButton(onPressed: prov.load, child: const Text('Coba lagi'))
+                      TextButton(onPressed: prov.load, child: Text(l10n.commonRetry))
                     ],
                   ),
                 ProjectSearchBar(
@@ -171,9 +173,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   firstDay: DateTime.utc(2020, 1, 1),
                   lastDay: DateTime.utc(2100, 12, 31),
                   focusedDay: _focused,
-                  locale: 'id_ID',
+                  locale: Localizations.localeOf(context).toString(),
                   startingDayOfWeek: StartingDayOfWeek.monday,
-                  availableCalendarFormats: const {CalendarFormat.month: 'Bulan'},
+                  availableCalendarFormats: {CalendarFormat.month: l10n.homeCalendarMonth},
                   headerStyle: const HeaderStyle(
                       formatButtonVisible: false, titleCentered: true),
                   selectedDayPredicate: (d) => isSameDay(_selected, d),
@@ -215,19 +217,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   spacing: 12,
                   runSpacing: 4,
                   children: [
-                    _legendDot(colorOf(ProjectStatus.safe), 'Aman'),
-                    _legendDot(colorOf(ProjectStatus.warning), '≤ 3 hari'),
-                    _legendDot(colorOf(ProjectStatus.urgent), '≤ 1 hari / telat'),
-                    _legendDot(colorOf(ProjectStatus.completed), 'Selesai'),
+                    _legendDot(colorOf(ProjectStatus.safe), l10n.statusSafe),
+                    _legendDot(colorOf(ProjectStatus.warning), l10n.homeLegendWarning),
+                    _legendDot(colorOf(ProjectStatus.urgent), l10n.homeLegendUrgent),
+                    _legendDot(colorOf(ProjectStatus.completed), l10n.statusCompleted),
                   ],
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                  child: Text('Daftar Project (${visible.length})',
+                  child: Text(l10n.homeProjectListTitle(visible.length),
                       style: Theme.of(context).textTheme.titleMedium),
                 ),
                 if (visible.isEmpty)
-                  _emptyState(prov)
+                  _emptyState(l10n, prov)
                 else
                   for (final p in visible)
                     Padding(

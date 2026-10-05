@@ -1,10 +1,12 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../data/project_repository.dart';
+import '../l10n/app_localizations.dart';
 import '../models/app_settings.dart';
-import '../models/project.dart' hide Priority;
+import '../models/project.dart' show Project;
 import '../utils/date_utils.dart';
 import '../utils/motivation_quotes.dart';
 
@@ -29,12 +31,21 @@ class NotificationService {
     }
   }
 
-  static Future<void> _show(int id, String title, String body) {
+  /// The alarm isolate has no BuildContext, so strings are looked up by locale.
+  /// Languages without translations yet resolve to English.
+  static AppLocalizations _l10n(AppSettings s) {
+    final locale = AppLanguage.toLocale(s.languageCode);
+    final supported = AppLocalizations.delegate.isSupported(locale);
+    return lookupAppLocalizations(supported ? locale : const Locale('en'));
+  }
+
+  static Future<void> _show(
+      AppLocalizations l10n, int id, String title, String body) {
     final details = NotificationDetails(
       android: AndroidNotificationDetails(
         'project_reminders',
-        'Pengingat Project',
-        channelDescription: 'Pengingat harian dan deadline project',
+        l10n.notificationChannelName,
+        channelDescription: l10n.notificationChannelDescription,
         importance: Importance.high,
         priority: Priority.high,
         // Big text so every project line is visible without expanding blindly.
@@ -51,6 +62,7 @@ class NotificationService {
   /// Called by the daily alarm: the summary plus each project's custom
   /// reminders. Doing per-project reminders here (same hour) avoids a timezone package.
   static Future<void> fireDaily(ProjectRepository repo, AppSettings s) async {
+    final l10n = _l10n(s);
     final today = dateOnly(DateTime.now());
     final all = await repo.getAll();
     // Archived or finished projects never nag.
@@ -65,11 +77,12 @@ class NotificationService {
 
     if (active.isNotEmpty) {
       final lines = active
-          .map((p) => '${p.name} — tinggal ${daysLeftFor(p.deadline)} hari lagi')
+          .map((p) => l10n.notificationSummaryLine(p.name, daysLeftFor(p.deadline)))
           .join('\n');
-      final body =
-          s.motivationEnabled ? '$lines\n\n${MotivationQuotes.random()}' : lines;
-      await _show(_summaryId, 'Woy lu ada ${active.length} project nih', body);
+      final body = s.motivationEnabled
+          ? '$lines\n\n${MotivationQuotes.random(s.languageCode)}'
+          : lines;
+      await _show(l10n, _summaryId, l10n.notificationSummaryTitle(active.length), body);
     }
 
     for (final p in live) {
@@ -77,15 +90,16 @@ class NotificationService {
       // The list index doubles as the notification slot, so max 3 ids per project.
       final slot = p.reminderDays.indexOf(left);
       if (slot < 0) continue;
+      final id = _projectId(p, slot);
       if (left == 0) {
-        await _show(_projectId(p, slot), 'Hari ini deadline: ${p.name}',
-            'Countdown 24 jam. Kalau ga kelar, project jadi ngarett.');
+        await _show(l10n, id, l10n.notificationTodayTitle(p.name),
+            l10n.notificationTodayBody);
       } else if (left == 1) {
-        await _show(_projectId(p, slot), 'Deadline besok: ${p.name}',
-            'Tinggal 1 hari lagi. Gas selesaikan!');
+        await _show(l10n, id, l10n.notificationTomorrowTitle(p.name),
+            l10n.notificationTomorrowBody);
       } else {
-        await _show(_projectId(p, slot), 'Deadline $left hari lagi: ${p.name}',
-            'Siapkan dari sekarang, jangan mepet.');
+        await _show(l10n, id, l10n.notificationSoonTitle(left, p.name),
+            l10n.notificationSoonBody);
       }
     }
   }

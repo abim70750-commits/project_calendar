@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 import '../data/project_repository.dart';
+import '../l10n/app_localizations.dart';
 import '../models/project.dart';
 import '../models/subtask.dart';
 import '../services/overdue_checker.dart';
@@ -15,34 +16,23 @@ Future<void> runGuarded(BuildContext context, Future<void> Function() action) as
     await action();
   } catch (e) {
     if (context.mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Terjadi kesalahan: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(AppLocalizations.of(context)!.errorGeneric(e.toString()))));
     }
   }
 }
 
 /// Lifecycle bucket used by the status filter and the statistics screen.
-enum StatusFilter {
-  all('Semua'),
-  notStarted('Belum Mulai'),
-  ongoing('Berlangsung'),
-  completed('Selesai'),
-  overdue('Overdue');
-
-  const StatusFilter(this.label);
-  final String label;
-}
+/// Display names live in l10n_extensions.dart.
+enum StatusFilter { all, notStarted, ongoing, completed, overdue }
 
 enum SortOption {
-  deadlineAsc('Deadline terdekat'),
-  deadlineDesc('Deadline terjauh'),
-  startAsc('Tanggal mulai'),
-  progressDesc('Progres tertinggi'),
-  priorityDesc('Prioritas tertinggi'),
-  createdDesc('Terbaru dibuat');
-
-  const SortOption(this.label);
-  final String label;
+  deadlineAsc,
+  deadlineDesc,
+  startAsc,
+  progressDesc,
+  priorityDesc,
+  createdDesc,
 }
 
 /// Maps a project to exactly one bucket (never [StatusFilter.all]).
@@ -204,7 +194,7 @@ class ProjectProvider extends ChangeNotifier {
       _projects = await _repo.getAll();
       loadError = null;
     } catch (e) {
-      loadError = 'Gagal memuat data: $e';
+      loadError = e.toString();
     }
     loading = false;
     notifyListeners();
@@ -216,7 +206,7 @@ class ProjectProvider extends ChangeNotifier {
       _projects = await _repo.getAll();
       loadError = null;
     } catch (e) {
-      loadError = 'Gagal memuat data: $e';
+      loadError = e.toString();
     }
     notifyListeners();
   }
@@ -289,14 +279,15 @@ class ProjectProvider extends ChangeNotifier {
       ));
 
   /// Clone shifted by one day. Subtasks are copied but reset to "not done"
-  /// because the copy is a fresh run of the same work.
-  Future<Project> duplicate(Project p) async {
+  /// because the copy is a fresh run of the same work. [nameSuffix] is passed in
+  /// by the UI so the "(copy)" marker can be translated.
+  Future<Project> duplicate(Project p, {String nameSuffix = 'copy'}) async {
     final now = DateTime.now();
     final newId = const Uuid().v4();
     DateTime plusOneDay(DateTime d) => DateTime(d.year, d.month, d.day + 1);
     final copy = Project(
       id: newId,
-      name: '${p.name} (copy)',
+      name: '${p.name} ($nameSuffix)',
       startDate: plusOneDay(p.startDate),
       deadline: plusOneDay(p.deadline),
       progress: 0,
@@ -340,7 +331,8 @@ class ProjectProvider extends ChangeNotifier {
   Future<int> importJson(String raw, {required bool replace}) async {
     final decoded = jsonDecode(raw);
     if (decoded is! Map || decoded['projects'] is! List) {
-      throw const FormatException('Format file tidak dikenali');
+      // The settings screen catches FormatException and shows a localized message.
+      throw const FormatException('Unrecognized backup format');
     }
     final imported = (decoded['projects'] as List)
         .map((e) => Project.fromJson(Map<String, dynamic>.from(e as Map)))

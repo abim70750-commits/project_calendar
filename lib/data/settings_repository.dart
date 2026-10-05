@@ -21,6 +21,7 @@ class SettingsRepository {
         notificationsEnabled:
             p.getBool('notificationsEnabled') ?? d.notificationsEnabled,
         motivationEnabled: p.getBool('motivationEnabled') ?? d.motivationEnabled,
+        languageCode: p.getString('languageCode'),
       );
     } catch (_) {
       return const AppSettings();
@@ -35,5 +36,11 @@ class SettingsRepository {
     await p.setInt('notificationMinute', s.notificationMinute);
     await p.setBool('notificationsEnabled', s.notificationsEnabled);
     await p.setBool('motivationEnabled', s.motivationEnabled);
+    final lang = s.languageCode;
+    if (lang == null) {
+      await p.remove('languageCode');
+    } else {
+      await p.setString('languageCode', lang);
+    }
   }
 }

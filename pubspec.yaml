@@ -1,7 +1,7 @@
 name: project_calendar
-description: Aplikasi manajemen project berbasis kalender.
+description: Calendar-based project management app with color-coded deadlines, notifications, and statistics.
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.1.0+2
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -9,7 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  # SDK package (not pub.dev): needed so date pickers render in Indonesian.
+  # SDK package (not pub.dev): provides the Material/Widgets localizations used by gen-l10n.
   flutter_localizations:
     sdk: flutter
   sqflite: ^2.3.3
@@ -20,7 +20,8 @@ dependencies:
   table_calendar: ^3.1.2
   provider: ^6.1.2
   shared_preferences: ^2.3.2
-  intl: ^0.20.3
+  # 'any' on purpose: flutter_localizations pins the exact intl version per Flutter release.
+  intl: any
   permission_handler: ^11.3.1
   uuid: ^4.5.0
   google_fonts: ^6.2.1
@@ -31,10 +32,34 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  generate: true
   fonts:
     - family: MinecraftCustom
       fonts:
         - asset: assets/fonts/minecraft.ttf
+    - family: Minecraftia
+      fonts:
+        - asset: assets/fonts/minecraftia.ttf
+    - family: ArastinPro
+      fonts:
+        - asset: assets/fonts/arastin_pro.ttf
+    - family: JMHTypewriter
+      fonts:
+        - asset: assets/fonts/jmh_typewriter_thin.ttf
+          weight: 200
+        - asset: assets/fonts/jmh_typewriter_regular.ttf
+          weight: 400
+        - asset: assets/fonts/jmh_typewriter_bold.ttf
+          weight: 700
+        - asset: assets/fonts/jmh_typewriter_black.ttf
+          weight: 900
+    - family: MangaTemple
+      fonts:
+        - asset: assets/fonts/manga_temple.ttf
+        - asset: assets/fonts/manga_temple_bold.ttf
+          weight: 700
+        - asset: assets/fonts/manga_temple_italic.ttf
+          style: italic
 
 flutter_launcher_icons:
   android: true

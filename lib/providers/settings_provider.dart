@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data/settings_repository.dart';
@@ -10,16 +11,29 @@ class SettingsProvider extends ChangeNotifier {
 
   AppSettings settings = const AppSettings();
 
-  /// False when the bundled TTF is missing or empty; the theme then falls back.
-  bool customFontAvailable = false;
+  /// Bundled font ids whose asset really loaded. A missing or empty TTF is
+  /// simply absent here, and the theme falls back instead of crashing.
+  final Set<String> _availableFonts = {};
+
+  bool fontAvailable(String id) {
+    final font = AppFont.byId(id);
+    // Fonts without an asset (PressStart2P, system) are always "available".
+    return font.asset == null || _availableFonts.contains(font.id);
+  }
+
+  Locale get locale => AppLanguage.toLocale(settings.languageCode);
 
   Future<void> init() async {
     settings = await _repo.load();
-    try {
-      final data = await rootBundle.load('assets/fonts/minecraft.ttf');
-      customFontAvailable = data.lengthInBytes > 0;
-    } catch (_) {
-      customFontAvailable = false;
+    for (final font in AppFont.all) {
+      final asset = font.asset;
+      if (asset == null) continue;
+      try {
+        final data = await rootBundle.load(asset);
+        if (data.lengthInBytes > 0) _availableFonts.add(font.id);
+      } catch (_) {
+        // Missing asset: leave it out of the available set.
+      }
     }
     notifyListeners();
   }

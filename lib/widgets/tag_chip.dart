@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/tag.dart';
 import '../providers/tag_provider.dart';
 
@@ -105,16 +106,17 @@ class _TagEditorDialogState extends State<_TagEditorDialog> {
   }
 
   void _submit() {
+    final l10n = AppLocalizations.of(context)!;
     final name = _name.text.trim();
     String? error;
     if (name.isEmpty) {
-      error = 'Nama tag wajib diisi';
+      error = l10n.tagEditorNameRequired;
     } else if (name.length > 24) {
-      error = 'Maksimal 24 karakter';
+      error = l10n.tagEditorNameTooLong;
     } else if (context
         .read<TagProvider>()
         .nameExists(name, exceptId: widget.existing?.id)) {
-      error = 'Nama tag sudah dipakai';
+      error = l10n.tagEditorNameTaken;
     }
     if (error != null) {
       setState(() => _error = error);
@@ -135,8 +137,11 @@ class _TagEditorDialogState extends State<_TagEditorDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
-      title: Text(widget.existing == null ? 'Tag baru' : 'Ubah tag'),
+      title: Text(widget.existing == null
+          ? l10n.tagEditorCreateTitle
+          : l10n.tagEditorEditTitle),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -147,14 +152,14 @@ class _TagEditorDialogState extends State<_TagEditorDialog> {
               autofocus: true,
               maxLength: 24,
               decoration: InputDecoration(
-                labelText: 'Nama tag',
+                labelText: l10n.tagEditorNameLabel,
                 errorText: _error,
                 border: const OutlineInputBorder(),
               ),
               onSubmitted: (_) => _submit(),
             ),
             const SizedBox(height: 8),
-            const Text('Warna'),
+            Text(l10n.tagEditorColorLabel),
             const SizedBox(height: 8),
             Wrap(
               spacing: 10,
@@ -191,8 +196,9 @@ class _TagEditorDialogState extends State<_TagEditorDialog> {
       ),
       actions: [
         TextButton(
-            onPressed: () => Navigator.of(context).pop(), child: const Text('Batal')),
-        FilledButton(onPressed: _submit, child: const Text('Simpan')),
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.commonCancel)),
+        FilledButton(onPressed: _submit, child: Text(l10n.commonSave)),
       ],
     );
   }

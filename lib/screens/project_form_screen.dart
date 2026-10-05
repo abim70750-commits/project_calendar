@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/project.dart';
 import '../providers/project_provider.dart';
 import '../providers/tag_provider.dart';
 import '../utils/date_utils.dart';
+import '../utils/l10n_extensions.dart';
 import '../widgets/priority_badge.dart';
 import '../widgets/tag_chip.dart';
 
@@ -29,8 +31,9 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
       TextEditingController(text: widget.project?.notes ?? '');
   DateTime? _start;
   DateTime? _deadline;
-  String? _startError;
-  String? _deadlineError;
+  bool _startMissing = false;
+  bool _deadlineMissing = false;
+  bool _deadlineBeforeStart = false;
   Priority _priority = Priority.none;
   final Set<String> _selectedTags = {};
   List<int> _reminders = List<int>.of(kDefaultReminders);
@@ -57,39 +60,43 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
   }
 
   Future<void> _pick(bool isStart) async {
+    final l10n = AppLocalizations.of(context)!;
     final initial = (isStart ? _start : _deadline) ?? _start ?? DateTime.now();
     final picked = await showDatePicker(
       context: context,
       initialDate: initial,
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
-      helpText: isStart ? 'Pilih tanggal mulai' : 'Pilih deadline',
-      cancelText: 'Batal',
-      confirmText: 'Pilih',
+      helpText: isStart ? l10n.formPickStartHelp : l10n.formPickDeadlineHelp,
+      cancelText: l10n.commonCancel,
+      confirmText: l10n.commonSelect,
     );
     if (picked == null) return;
     setState(() {
       if (isStart) {
         _start = dateOnly(picked);
-        _startError = null;
+        _startMissing = false;
       } else {
         _deadline = dateOnly(picked);
-        _deadlineError = null;
+        _deadlineMissing = false;
       }
+      _deadlineBeforeStart =
+          _start != null && _deadline != null && _deadline!.isBefore(_start!);
     });
   }
 
   Future<void> _addReminder() async {
+    final l10n = AppLocalizations.of(context)!;
     final options = _reminderChoices.where((d) => !_reminders.contains(d)).toList();
     final picked = await showDialog<int>(
       context: context,
       builder: (ctx) => SimpleDialog(
-        title: const Text('Ingatkan sebelum deadline'),
+        title: Text(l10n.formReminderDialogTitle),
         children: [
           for (final d in options)
             SimpleDialogOption(
               onPressed: () => Navigator.of(ctx).pop(d),
-              child: Text(d == 0 ? 'Hari-H (hari deadline)' : '$d hari sebelum deadline'),
+              child: Text(reminderLabel(l10n, d)),
             ),
         ],
       ),
@@ -111,19 +118,13 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
 
   bool _validate() {
     final formOk = _formKey.currentState!.validate();
-    String? startErr;
-    String? deadlineErr;
-    if (_start == null) startErr = 'Tanggal mulai wajib dipilih';
-    if (_deadline == null) {
-      deadlineErr = 'Deadline wajib dipilih';
-    } else if (_start != null && _deadline!.isBefore(_start!)) {
-      deadlineErr = 'Deadline tidak boleh sebelum tanggal mulai';
-    }
     setState(() {
-      _startError = startErr;
-      _deadlineError = deadlineErr;
+      _startMissing = _start == null;
+      _deadlineMissing = _deadline == null;
+      _deadlineBeforeStart =
+          _start != null && _deadline != null && _deadline!.isBefore(_start!);
     });
-    return formOk && startErr == null && deadlineErr == null;
+    return formOk && !_startMissing && !_deadlineMissing && !_deadlineBeforeStart;
   }
 
   Future<void> _save() async {
@@ -170,6 +171,7 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
   }
 
   Widget _dateField(String label, DateTime? value, String? error, bool isStart) {
+    final l10n = AppLocalizations.of(context)!;
     return InkWell(
       onTap: () => _pick(isStart),
       child: InputDecorator(
@@ -179,7 +181,7 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
           border: const OutlineInputBorder(),
           suffixIcon: const Icon(Icons.calendar_today),
         ),
-        child: Text(value == null ? 'Pilih tanggal' : formatDate(value)),
+        child: Text(value == null ? l10n.formPickDate : formatDate(context, value)),
       ),
     );
   }
@@ -191,12 +193,20 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final editing = widget.project != null;
     final tags = context.watch<TagProvider>().tags;
     final sortedReminders = [..._reminders]..sort((a, b) => b.compareTo(a));
 
+    // Errors are derived from flags (not stored strings) so they re-render in the active language.
+    final startError = _startMissing ? l10n.formStartRequired : null;
+    final deadlineError = _deadlineMissing
+        ? l10n.formDeadlineRequired
+        : (_deadlineBeforeStart ? l10n.formDeadlineBeforeStart : null);
+
     return Scaffold(
-      appBar: AppBar(title: Text(editing ? 'Ubah Project' : 'Project Baru')),
+      appBar: AppBar(
+          title: Text(editing ? l10n.formTitleEdit : l10n.formTitleCreate)),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -205,16 +215,16 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
             TextFormField(
               controller: _name,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(
-                  labelText: 'Nama project', border: OutlineInputBorder()),
+              decoration: InputDecoration(
+                  labelText: l10n.formNameLabel, border: const OutlineInputBorder()),
               validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Nama project wajib diisi' : null,
+                  (v == null || v.trim().isEmpty) ? l10n.formNameRequired : null,
             ),
             const SizedBox(height: 16),
-            _dateField('Tanggal mulai', _start, _startError, true),
+            _dateField(l10n.formStartDateLabel, _start, startError, true),
             const SizedBox(height: 16),
-            _dateField('Deadline', _deadline, _deadlineError, false),
-            _sectionTitle('Prioritas'),
+            _dateField(l10n.formDeadlineLabel, _deadline, deadlineError, false),
+            _sectionTitle(l10n.formPriorityTitle),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -222,13 +232,13 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
                 for (final p in Priority.values)
                   ChoiceChip(
                     avatar: Icon(Icons.flag, size: 16, color: priorityColor(p)),
-                    label: Text(p.label),
+                    label: Text(p.label(l10n)),
                     selected: _priority == p,
                     onSelected: (_) => setState(() => _priority = p),
                   ),
               ],
             ),
-            _sectionTitle('Tag'),
+            _sectionTitle(l10n.formTagsTitle),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -247,25 +257,25 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
                   ),
                 ActionChip(
                   avatar: const Icon(Icons.add, size: 18),
-                  label: const Text('Tag baru'),
+                  label: Text(l10n.formNewTag),
                   onPressed: _newTag,
                 ),
               ],
             ),
-            _sectionTitle('Pengingat deadline'),
+            _sectionTitle(l10n.formRemindersTitle),
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: [
                 for (final d in sortedReminders)
                   InputChip(
-                    label: Text(reminderLabel(d)),
+                    label: Text(reminderLabel(l10n, d)),
                     onDeleted: () => setState(() => _reminders.remove(d)),
                   ),
                 if (_reminders.length < kMaxReminders)
                   ActionChip(
                     avatar: const Icon(Icons.add_alarm, size: 18),
-                    label: const Text('Tambah'),
+                    label: Text(l10n.formAddReminder),
                     onPressed: _addReminder,
                   ),
               ],
@@ -273,25 +283,25 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
             const SizedBox(height: 6),
             Text(
               _reminders.isEmpty
-                  ? 'Tidak ada pengingat khusus untuk project ini.'
-                  : 'Maksimal $kMaxReminders pengingat, dikirim pada jam notifikasi harian.',
+                  ? l10n.formReminderNone
+                  : l10n.formReminderHintMax(kMaxReminders),
               style: Theme.of(context).textTheme.bodySmall,
             ),
-            _sectionTitle('Catatan awal (markdown)'),
+            _sectionTitle(l10n.formNotesTitle),
             TextField(
               controller: _notes,
               minLines: 4,
               maxLines: 10,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Tulis catatan dengan markdown...',
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                hintText: l10n.formNotesHint,
               ),
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: _saving ? null : _save,
               icon: const Icon(Icons.save),
-              label: Text(_saving ? 'Menyimpan...' : 'Simpan'),
+              label: Text(_saving ? l10n.formSaving : l10n.formSave),
             ),
           ],
         ),

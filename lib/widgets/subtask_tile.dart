@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/subtask.dart';
 
 class SubtaskTile extends StatelessWidget {
@@ -18,6 +19,7 @@ class SubtaskTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ListTile(
       contentPadding: const EdgeInsets.only(left: 0, right: 32),
       leading: Checkbox(value: subtask.isDone, onChanged: (_) => onToggle()),
@@ -32,9 +34,11 @@ class SubtaskTile extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-              tooltip: 'Ubah', icon: const Icon(Icons.edit, size: 20), onPressed: onEdit),
+              tooltip: l10n.commonEdit,
+              icon: const Icon(Icons.edit, size: 20),
+              onPressed: onEdit),
           IconButton(
-              tooltip: 'Hapus',
+              tooltip: l10n.commonDelete,
               icon: const Icon(Icons.delete_outline, size: 20),
               onPressed: onDelete),
         ],

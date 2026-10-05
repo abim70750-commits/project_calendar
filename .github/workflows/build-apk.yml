@@ -45,6 +45,11 @@ jobs:
 
       - run: flutter pub get
 
+      # Generates lib/l10n/app_localizations*.dart from the ARB files. Runs here
+      # (not on a phone) because gen-l10n needs the full Flutter SDK.
+      - name: Generate localizations
+        run: flutter gen-l10n
+
       - name: Check signing secrets
         id: signing
         env:
@@ -95,10 +100,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
-          name: Project Calendar - Build ${{ github.run_number }}
-          body: |
-            Build otomatis dari commit terbaru.
-
-            Commit: ${{ github.event.head_commit.message }}
-          generate_release_notes: true
+          name: Build ${{ github.run_number }}
           files: build/app/outputs/flutter-apk/*.apk

@@ -24,7 +24,8 @@ Future<void> main() async {
     }
   }
 
-  await safe(() => initializeDateFormatting('id_ID'), 'date formatting');
+  // No argument: load date symbols for every locale so any language choice formats correctly.
+  await safe(() => initializeDateFormatting(), 'date formatting');
   await safe(AndroidAlarmManager.initialize, 'alarm manager');
   await safe(NotificationService.init, 'notifications');
 

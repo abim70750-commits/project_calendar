@@ -1,19 +1,46 @@
 # Project Calendar
 
-Aplikasi manajemen project berbasis kalender (Android, Flutter, Material 3). Antarmuka berbahasa Indonesia.
+Calendar-based project management app with color-coded deadlines, notifications, and statistics.
+Android only, built with Flutter (Material 3, dark theme by default).
 
-## Cara kerja build
+## Features
 
-Repo ini hanya berisi kode inti. Folder Android yang di-*generate* (gradlew, ikon, `launch_background`) dibuat otomatis oleh langkah `flutter create` di CI tanpa menimpa file yang sudah ada. Untuk build lokal, jalankan sekali:
+- Month calendar with a colored dot per project (green / yellow / red / grey)
+- Projects with start date, deadline, manual progress, markdown notes, and a reorderable subtask checklist
+- Priority levels, colored tags (many-to-many), search, filters, and sorting
+- Daily notification at a configurable time (works with the app closed), plus up to 3 custom reminders per project
+- Overdue projects stay visible and turn permanently red until completed
+- Archive (completed projects are archived after 7 days) and a statistics screen
+- Export to `.ics` (calendar apps), JSON export/import, reset
+- Localization infrastructure (English is the only complete language for now)
+
+## Localization
+
+Strings live in `lib/l10n/app_en.arb`. The Dart code (`app_localizations.dart`) is **generated** by
+`flutter gen-l10n` and is not committed.
+
+- **GitHub Actions runs `flutter gen-l10n` for you** before every build. You do not need it on Termux.
+- To add a language, create `lib/l10n/app_<code>.arb` (for example `app_id.arb`) with the same keys.
+  Languages that have no ARB file yet fall back to English.
+- The language selector in Settings already lists all planned languages and stores the choice in
+  `shared_preferences` under `languageCode`.
+- Motivation quotes live in `lib/utils/motivation_quotes.dart` as a `languageCode -> List<String>` map.
+
+## Build locally (optional)
 
 ```bash
 flutter create --platforms=android --org com.projectcalendar --project-name project_calendar .
 rm -rf test android/app/src/main/kotlin/com/projectcalendar/project_calendar
-flutter pub get
+flutter pub get          # also runs gen-l10n because pubspec has `generate: true`
 flutter run
 ```
 
-## 1. Buat keystore (Termux-friendly)
+The `flutter create` step only fills in what is missing (Gradle wrapper, launcher icons,
+`launch_background`); it never overwrites files that are already in this repo.
+
+## Build the APK with GitHub Actions (Termux-friendly)
+
+### 1. Create a keystore
 
 ```bash
 pkg install openjdk-17
@@ -21,31 +48,31 @@ keytool -genkeypair -v -keystore keystore.jks -alias projectcalendar \
   -keyalg RSA -keysize 2048 -validity 10000
 ```
 
-Simpan `keystore.jks` dan password-nya di tempat aman. Jangan di-commit (sudah ada di `.gitignore`).
+Keep `keystore.jks` and its passwords somewhere safe. They are already ignored by `.gitignore`.
 
-## 2. Base64 keystore
+### 2. Base64-encode it
 
 ```bash
 base64 -w 0 keystore.jks > keystore.b64
 cat keystore.b64
 ```
 
-Salin seluruh isinya (satu baris).
+Copy the whole single line.
 
-## 3. Tambah 4 GitHub Secrets
+### 3. Add four GitHub Secrets
 
-Repo → Settings → Secrets and variables → Actions → New repository secret:
+Repository → Settings → Secrets and variables → Actions → New repository secret:
 
-| Secret | Isi |
+| Secret | Value |
 |---|---|
-| `KEYSTORE_BASE64` | isi `keystore.b64` |
-| `KEYSTORE_PASSWORD` | password keystore |
-| `KEY_ALIAS` | `projectcalendar` (sesuai `-alias`) |
-| `KEY_PASSWORD` | password key |
+| `KEYSTORE_BASE64` | contents of `keystore.b64` |
+| `KEYSTORE_PASSWORD` | keystore password |
+| `KEY_ALIAS` | `projectcalendar` (the `-alias` you used) |
+| `KEY_PASSWORD` | key password |
 
-Tanpa secrets, workflow tetap jalan dan membangun APK debug (dengan peringatan di log).
+Without these secrets the workflow still runs and builds a debug APK, with a warning in the log.
 
-## 4. Push dan unduh APK
+### 4. Push and download the APK
 
 ```bash
 git init && git add . && git commit -m "Initial commit"
@@ -54,8 +81,11 @@ git remote add origin https://github.com/USERNAME/project_calendar.git
 git push -u origin main
 ```
 
-Buka tab **Actions** → run terbaru → **Artifacts**, atau tab **Releases** untuk APK per-ABI. Pada HP modern pilih `app-arm64-v8a-release.apk`.
+Open the **Actions** tab → latest run → **Artifacts**, or the **Releases** tab for per-ABI APKs.
+On a modern phone pick `app-arm64-v8a-release.apk`.
 
-## Font
+## License
 
-Font default ada di `assets/fonts/minecraft.ttf`. Jika file hilang/kosong saat runtime, app otomatis memakai PressStart2P (google_fonts, butuh internet saat pertama), lalu font sistem. Catatan: `pubspec.yaml` mendeklarasikan aset ini, jadi file harus ada saat build.
+Copyright © 2026 Abi Manyu. All rights reserved.
+
+Licensed under the MIT License. See [LICENSE](LICENSE) for details.

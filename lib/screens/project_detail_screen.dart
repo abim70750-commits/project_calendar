@@ -3,11 +3,13 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/project.dart';
 import '../models/subtask.dart';
 import '../providers/project_provider.dart';
 import '../utils/color_logic.dart';
 import '../utils/date_utils.dart';
+import '../utils/l10n_extensions.dart';
 import '../widgets/priority_badge.dart';
 import '../widgets/progress_slider.dart';
 import '../widgets/status_badge.dart';
@@ -46,6 +48,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
       ));
 
   Future<String?> _askText(String title, String initial) {
+    final l10n = AppLocalizations.of(context)!;
     final ctrl = TextEditingController(text: initial);
     return showDialog<String>(
       context: context,
@@ -55,21 +58,25 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
           controller: ctrl,
           autofocus: true,
           textCapitalization: TextCapitalization.sentences,
-          decoration: const InputDecoration(hintText: 'Judul sub-tugas'),
+          decoration: InputDecoration(hintText: l10n.detailSubtaskHint),
           onSubmitted: (v) => Navigator.of(ctx).pop(v),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Batal')),
+          TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(l10n.commonCancel)),
           FilledButton(
               onPressed: () => Navigator.of(ctx).pop(ctrl.text),
-              child: const Text('Simpan')),
+              child: Text(l10n.commonSave)),
         ],
       ),
     );
   }
 
   Future<void> _addSubtask(Project p) async {
-    final title = (await _askText('Sub-tugas baru', ''))?.trim();
+    final title =
+        (await _askText(AppLocalizations.of(context)!.detailSubtaskNewTitle, ''))
+            ?.trim();
     if (title == null || title.isEmpty) return;
     await _saveSubtasks(p, [
       ...p.subtasks,
@@ -78,22 +85,28 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   }
 
   Future<void> _editSubtask(Project p, Subtask s) async {
-    final title = (await _askText('Ubah sub-tugas', s.title))?.trim();
+    final title = (await _askText(
+            AppLocalizations.of(context)!.detailSubtaskEditTitle, s.title))
+        ?.trim();
     if (title == null || title.isEmpty) return;
     await _saveSubtasks(
         p, [for (final x in p.subtasks) x.id == s.id ? x.copyWith(title: title) : x]);
   }
 
   Future<void> _delete(Project p) async {
+    final l10n = AppLocalizations.of(context)!;
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Hapus project?'),
-        content: Text(
-            '"${p.name}" beserta catatan, sub-tugas, dan tautan tag-nya akan dihapus permanen.'),
+        title: Text(l10n.detailDeleteTitle),
+        content: Text(l10n.detailDeleteMessage(p.name)),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Batal')),
-          FilledButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Hapus')),
+          TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(l10n.commonCancel)),
+          FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text(l10n.commonDelete)),
         ],
       ),
     );
@@ -105,12 +118,13 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   }
 
   Future<void> _duplicate(Project p) async {
+    final l10n = AppLocalizations.of(context)!;
     final provider = context.read<ProjectProvider>();
     await runGuarded(context, () async {
-      final copy = await provider.duplicate(p);
+      final copy = await provider.duplicate(p, nameSuffix: l10n.detailDuplicateSuffix);
       if (!mounted) return;
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Project diduplikasi')));
+          .showSnackBar(SnackBar(content: Text(l10n.detailDuplicated)));
       // Replace (not push) so Back returns to the list, not to the original.
       Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (_) => ProjectDetailScreen(projectId: copy.id)));
@@ -118,6 +132,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   }
 
   Future<void> _toggleArchive(Project p) async {
+    final l10n = AppLocalizations.of(context)!;
     final provider = context.read<ProjectProvider>();
     await runGuarded(context, () async {
       if (p.isArchived) {
@@ -127,23 +142,24 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
       }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(p.isArchived ? 'Project dipulihkan' : 'Project diarsipkan')));
+          content: Text(p.isArchived ? l10n.detailRestored : l10n.detailArchived)));
     });
   }
 
   Widget _notesSection(Project p) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Text('Catatan', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.detailNotesTitle, style: Theme.of(context).textTheme.titleMedium),
             const Spacer(),
             SegmentedButton<bool>(
               showSelectedIcon: false,
-              segments: const [
-                ButtonSegment(value: true, label: Text('Edit')),
-                ButtonSegment(value: false, label: Text('Lihat')),
+              segments: [
+                ButtonSegment(value: true, label: Text(l10n.detailNotesEdit)),
+                ButtonSegment(value: false, label: Text(l10n.detailNotesView)),
               ],
               selected: {_editingNotes},
               onSelectionChanged: (s) async {
@@ -163,9 +179,9 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             controller: _notes,
             minLines: 5,
             maxLines: 14,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Tulis catatan dengan markdown...',
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              hintText: l10n.detailNotesHint,
             ),
           ),
           const SizedBox(height: 8),
@@ -176,9 +192,9 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                 await _save(p.copyWith(notes: _notes.text));
                 if (!mounted) return;
                 ScaffoldMessenger.of(context)
-                    .showSnackBar(const SnackBar(content: Text('Catatan disimpan')));
+                    .showSnackBar(SnackBar(content: Text(l10n.detailNotesSaved)));
               },
-              child: const Text('Simpan catatan'),
+              child: Text(l10n.detailNotesSave),
             ),
           ),
         ] else
@@ -190,7 +206,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: p.notes.trim().isEmpty
-                ? const Text('Belum ada catatan.')
+                ? Text(l10n.detailNotesEmpty)
                 : MarkdownBody(data: p.notes, selectable: true),
           ),
       ],
@@ -199,11 +215,12 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final p = context.watch<ProjectProvider>().byId(widget.projectId);
     if (p == null) {
       return Scaffold(
         appBar: AppBar(),
-        body: const Center(child: Text('Project tidak ditemukan.')),
+        body: Center(child: Text(l10n.detailNotFound)),
       );
     }
     if (!_notesLoaded) {
@@ -214,7 +231,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     final reminders = [...p.reminderDays]..sort((a, b) => b.compareTo(a));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Detail Project')),
+      appBar: AppBar(title: Text(l10n.detailTitle)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -226,11 +243,11 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                 color: Colors.grey.withAlpha(40),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.archive, size: 18),
-                  SizedBox(width: 8),
-                  Expanded(child: Text('Project ini ada di arsip.')),
+                  const Icon(Icons.archive, size: 18),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(l10n.detailArchivedBanner)),
                 ],
               ),
             ),
@@ -243,7 +260,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             children: [
               StatusBadge(project: p),
               PriorityBadge(priority: p.priority),
-              Text(remainingText(p),
+              Text(remainingText(l10n, p),
                   style: TextStyle(color: color, fontWeight: FontWeight.bold)),
             ],
           ),
@@ -256,11 +273,12 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             ),
           ],
           const SizedBox(height: 12),
-          Text('Mulai: ${formatDate(p.startDate)}'),
-          Text('Deadline: ${formatDate(p.deadline)}'),
+          Text(l10n.detailStartLine(formatDate(context, p.startDate))),
+          Text(l10n.detailDeadlineLine(formatDate(context, p.deadline))),
           Text(reminders.isEmpty
-              ? 'Pengingat: tidak ada'
-              : 'Pengingat: ${reminders.map(reminderLabel).join(', ')}'),
+              ? l10n.detailRemindersNone
+              : l10n.detailRemindersLine(
+                  reminders.map((d) => reminderLabel(l10n, d)).join(', '))),
           const SizedBox(height: 16),
           ProgressSlider(
             value: p.progress,
@@ -272,23 +290,24 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
           const Divider(height: 32),
           Row(
             children: [
-              Text('Sub-tugas (${p.subtasks.where((s) => s.isDone).length}/${p.subtasks.length})',
+              Text(
+                  l10n.detailSubtasksTitle(
+                      p.subtasks.where((s) => s.isDone).length, p.subtasks.length),
                   style: Theme.of(context).textTheme.titleMedium),
               const Spacer(),
               IconButton(
-                  tooltip: 'Tambah sub-tugas',
+                  tooltip: l10n.detailAddSubtask,
                   icon: const Icon(Icons.add_circle_outline),
                   onPressed: () => _addSubtask(p)),
             ],
           ),
           if (p.subtasks.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
-              child: Text('Belum ada sub-tugas.'),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text(l10n.detailSubtasksEmpty),
             )
           else ...[
-            const Text('Tahan lama lalu geser untuk mengurutkan.',
-                style: TextStyle(fontSize: 11)),
+            Text(l10n.detailSubtasksReorderHint, style: const TextStyle(fontSize: 11)),
             ReorderableListView(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -324,33 +343,33 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
               progress: p.isCompleted ? p.progress : 100,
             )),
             icon: Icon(p.isCompleted ? Icons.undo : Icons.check_circle),
-            label: Text(p.isCompleted ? 'Batalkan selesai' : 'Tandai selesai'),
+            label: Text(p.isCompleted ? l10n.detailUndoComplete : l10n.detailMarkComplete),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
             onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => ProjectFormScreen(project: p))),
             icon: const Icon(Icons.edit),
-            label: const Text('Ubah'),
+            label: Text(l10n.commonEdit),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
             onPressed: () => _duplicate(p),
             icon: const Icon(Icons.copy),
-            label: const Text('Duplikat'),
+            label: Text(l10n.detailDuplicateButton),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
             onPressed: () => _toggleArchive(p),
             icon: Icon(p.isArchived ? Icons.unarchive : Icons.archive),
-            label: Text(p.isArchived ? 'Pulihkan dari arsip' : 'Arsipkan'),
+            label: Text(p.isArchived ? l10n.detailRestoreButton : l10n.detailArchiveButton),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
             onPressed: () => _delete(p),
             style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
             icon: const Icon(Icons.delete),
-            label: const Text('Hapus'),
+            label: Text(l10n.detailDeleteButton),
           ),
           const SizedBox(height: 24),
         ],
