@@ -1,0 +1,22 @@
+.dart_tool/
+.packages
+.pub-cache/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+.idea/
+local.properties
+android/.gradle/
+android/gradlew
+android/gradlew.bat
+android/gradle/wrapper/gradle-wrapper.jar
+android/app/debug
+android/app/profile
+android/app/release
+# Signing secrets: never commit
+*.jks
+*.keystore
+key.properties
+android/key.properties
+android/app/keystore.jks
