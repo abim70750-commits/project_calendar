@@ -53,7 +53,7 @@ class AppLanguage {
     AppLanguage('hi', 'हिन्दी'),
     AppLanguage('th', 'ไทย'),
     AppLanguage('vi', 'Tiếng Việt'),
-    AppLanguage('fil', 'Tagalog'),
+    AppLanguage('tl', 'Tagalog'),
     AppLanguage('ru', 'Русский'),
     AppLanguage('it', 'Italiano'),
     AppLanguage('tr', 'Türkçe'),

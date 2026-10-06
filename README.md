@@ -12,19 +12,21 @@ Android only, built with Flutter (Material 3, dark theme by default).
 - Overdue projects stay visible and turn permanently red until completed
 - Archive (completed projects are archived after 7 days) and a statistics screen
 - Export to `.ics` (calendar apps), JSON export/import, reset
-- Localization infrastructure (English is the only complete language for now)
+- 18 interface languages
 
 ## Localization
 
-Strings live in `lib/l10n/app_en.arb`. The Dart code (`app_localizations.dart`) is **generated** by
-`flutter gen-l10n` and is not committed.
+The app is available in 18 languages: English (US), Bahasa Indonesia, Chinese (Simplified and
+Traditional), Japanese, Korean, Spanish, Portuguese (Brazil), German, French, Arabic, Hindi, Thai,
+Vietnamese, Tagalog, Russian, Italian, and Turkish. Pick one in Settings → Language; the choice is
+stored in `shared_preferences` under `languageCode`.
 
-- **GitHub Actions runs `flutter gen-l10n` for you** before every build. You do not need it on Termux.
-- To add a language, create `lib/l10n/app_<code>.arb` (for example `app_id.arb`) with the same keys.
-  Languages that have no ARB file yet fall back to English.
-- The language selector in Settings already lists all planned languages and stores the choice in
-  `shared_preferences` under `languageCode`.
+- Strings live in `lib/l10n/app_<code>.arb`. `app_en.arb` is the template; every other file has the
+  same 205 keys.
+- The Dart code (`app_localizations.dart`) is **generated** by `flutter gen-l10n` and is not committed.
+  **GitHub Actions runs it for you** before every build, so you do not need it on Termux.
 - Motivation quotes live in `lib/utils/motivation_quotes.dart` as a `languageCode -> List<String>` map.
+- The non-English translations were not reviewed by native speakers. Corrections are welcome.
 
 ## Build locally (optional)
 

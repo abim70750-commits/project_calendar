@@ -246,7 +246,6 @@ class SettingsScreen extends StatelessWidget {
           ),
           ListTile(
             title: Text(l10n.settingsLanguageLabel),
-            subtitle: Text(l10n.settingsLanguageHint),
             trailing: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 160),
               child: DropdownButton<String>(
